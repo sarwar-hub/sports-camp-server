@@ -38,6 +38,7 @@ async function run() {
     // await client.connect();
 
     const coursesCollection = client.db('sportsCamp').collection('courses');
+    const instructorsCollection = client.db('sportsCamp').collection('instructors');
 
 
     // find all courses
@@ -45,6 +46,17 @@ async function run() {
         const result = await coursesCollection.find().toArray();
         res.send(result);
     })
+    
+    
+    
+    // find all courses
+    app.get('/instructors', async(req, res) => {
+        const result = await instructorsCollection.find().toArray();
+        res.send(result);
+    })
+
+    // find top courses based of number of students
+
     
 
 
