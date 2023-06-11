@@ -38,7 +38,7 @@ async function run() {
     // await client.connect();
 
     const coursesCollection = client.db('sportsCamp').collection('courses');
-    const instructorsCollection = client.db('sportsCamp').collection('instructors');
+    const usersCollection = client.db('sportsCamp').collection('users');
 
 
     // find all courses
@@ -49,21 +49,44 @@ async function run() {
     
     
     
-    // find all courses
+    // find all instructors
     app.get('/instructors', async(req, res) => {
-        const result = await instructorsCollection.find().toArray();
+        const query = {role: "instructor"}
+        const result = await usersCollection.find(query).toArray();
         res.send(result);
     })
 
     // find top courses based of number of students
     app.get('/topCourses', async(req, res) => {
         const result = await coursesCollection.find().sort({numberOfStudents: -1}).toArray();
-        res.send(result);
+        const slicedResult = result.slice(0, 6);
+        res.send(slicedResult);
     })
 
-    // find top courses based of number of students
+    // find top instructors based of number of students
     app.get('/topInstructors', async(req, res) => {
-        const result = await instructorsCollection.find().sort({numberOfStudents: -1}).toArray();
+        const query = {role: "instructor"}
+        const result = await usersCollection.find(query).sort({numberOfStudents: -1}).toArray();
+        const slicedResult = result.slice(0, 6);
+        res.send(slicedResult);
+    })
+
+
+
+    
+
+
+    // instert an user
+    app.post('/users', async(req, res) => {
+        const userInfo = req.body;
+        const user = {
+            name: userInfo.name,
+            email: userInfo.email,
+            photo: userInfo.photo,
+            role: userInfo.role
+        }
+
+        const result = await usersCollection.insertOne(user);
         res.send(result);
     })
 
