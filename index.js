@@ -56,6 +56,16 @@ async function run() {
     })
 
     // find top courses based of number of students
+    app.get('/topCourses', async(req, res) => {
+        const result = await coursesCollection.find().sort({numberOfStudents: -1}).toArray();
+        res.send(result);
+    })
+
+    // find top courses based of number of students
+    app.get('/topInstructors', async(req, res) => {
+        const result = await instructorsCollection.find().sort({numberOfStudents: -1}).toArray();
+        res.send(result);
+    })
 
     
 
