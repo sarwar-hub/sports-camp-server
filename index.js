@@ -41,6 +41,15 @@ async function run() {
     const usersCollection = client.db('sportsCamp').collection('users');
 
 
+    // find all users
+    app.get('/currentUser', async(req,  res) => {
+        const userEmail = req.query.email;
+        const query = {email: userEmail};
+        const result = await usersCollection.findOne(query);
+        res.send(result);
+        console.log(result);
+    })
+
     // find all courses
     app.get('/courses', async(req, res) => {
         const result = await coursesCollection.find().toArray();
