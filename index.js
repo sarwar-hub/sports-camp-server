@@ -131,6 +131,7 @@ async function run() {
         courseFee: data.fee,
         instructorName: data.instructor,
         instructorEmail: data.email,
+        status: "pending",
         students: 0,
       }
       const result = await coursesCollection.insertOne(courseInfo);
