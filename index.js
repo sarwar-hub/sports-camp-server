@@ -118,6 +118,25 @@ async function run() {
       res.send(result);
     })
 
+
+
+
+    // add new course
+    app.post('/courses', async(req, res) => {
+      const data = req.body;
+      const courseInfo = {
+        courseName: data.courseName,
+        thumbnail: data.thumbnail,
+        availableSeats: data.seats,
+        courseFee: data.fee,
+        instructorName: data.instructor,
+        instructorEmail: data.email,
+        students: 0,
+      }
+      const result = await coursesCollection.insertOne(courseInfo);
+      res.send(result);
+      
+    })
     
 
 
