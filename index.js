@@ -137,6 +137,17 @@ async function run() {
       res.send(result);
       
     })
+
+
+
+    // get courses by specific instructor
+    app.get('/coursesByInstructor', async(req, res) => {
+      const instructorEmail = req.query.email;
+      const query = {instructorEmail: instructorEmail};
+      const result = await coursesCollection.find(query).toArray();
+      res.send(result);
+      console.log(result);
+    })
     
 
 
