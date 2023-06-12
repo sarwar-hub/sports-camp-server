@@ -42,6 +42,13 @@ async function run() {
     const selectedCollection = client.db('sportsCamp').collection('selected');
 
 
+    // get all users
+    app.get('/users', async(req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    })
+
+
     // find current user
     app.get('/currentUser', async(req,  res) => {
         const userEmail = req.query.email;
