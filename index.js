@@ -39,15 +39,15 @@ async function run() {
 
     const coursesCollection = client.db('sportsCamp').collection('courses');
     const usersCollection = client.db('sportsCamp').collection('users');
+    const selectedCollection = client.db('sportsCamp').collection('selected');
 
 
-    // find all users
+    // find current user
     app.get('/currentUser', async(req,  res) => {
         const userEmail = req.query.email;
         const query = {email: userEmail};
         const result = await usersCollection.findOne(query);
         res.send(result);
-        console.log(result);
     })
 
     // find all courses
@@ -85,7 +85,7 @@ async function run() {
     
 
 
-    // instert an user
+    // add an user
     app.post('/users', async(req, res) => {
         const userInfo = req.body;
         const user = {
@@ -97,6 +97,25 @@ async function run() {
 
         const result = await usersCollection.insertOne(user);
         res.send(result);
+    })
+
+
+
+    // add seleceted items
+    app.post('/selectedItems', async(req, res) => {
+      const itemInfo = req.body;
+      const result = await selectedCollection.insertOne(itemInfo);
+      res.send(result);
+    })
+
+
+
+    // get selected items for sepecific user
+    app.get('/selectedItems', async(req, res) => {
+      const userEmail = req.query.email;
+      const query = {userEmail: userEmail};
+      const result = await selectedCollection.find(query).toArray();
+      res.send(result);
     })
 
     
