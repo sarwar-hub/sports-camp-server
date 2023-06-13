@@ -173,7 +173,7 @@ async function run() {
       res.send(result);
     })
     
-    // update user role to instructor
+    // update user role to admin
     app.patch('/makeAdmin/:id', async(req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
@@ -187,6 +187,35 @@ async function run() {
       res.send(result);
     })
     
+
+    // update course status to approved
+    app.patch('/approve/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const options = {upsert: true};
+      const doc = {
+        $set: {
+          status: 'approved'
+        }
+      }
+      const result = await coursesCollection.updateOne(query, doc, options);
+      res.send(result);
+    })
+    
+    
+    // update course status to denied
+    app.patch('/deny/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const options = {upsert: true};
+      const doc = {
+        $set: {
+          status: 'denied'
+        }
+      }
+      const result = await coursesCollection.updateOne(query, doc, options);
+      res.send(result);
+    })
 
 
 
