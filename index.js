@@ -134,6 +134,7 @@ async function run() {
         instructorEmail: data.email,
         status: "pending",
         students: 0,
+        feedback: ''
       }
       const result = await coursesCollection.insertOne(courseInfo);
       res.send(result);
@@ -195,7 +196,8 @@ async function run() {
       const options = {upsert: true};
       const doc = {
         $set: {
-          status: 'approved'
+          status: 'approved',
+          feedback: ''
         }
       }
       const result = await coursesCollection.updateOne(query, doc, options);
@@ -206,11 +208,14 @@ async function run() {
     // update course status to denied
     app.patch('/deny/:id', async(req, res) => {
       const id = req.params.id;
+      const data = req.body;
+      
       const query = {_id: new ObjectId(id)};
       const options = {upsert: true};
       const doc = {
         $set: {
-          status: 'denied'
+          status: 'denied',
+          feedback: data.feedback
         }
       }
       const result = await coursesCollection.updateOne(query, doc, options);
