@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 require('dotenv').config(); 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 app.get('/', async(req, res) => {
     res.send('sports-camp server runing');
@@ -57,12 +57,12 @@ async function run() {
         res.send(result);
     })
 
+
     // find all courses
     app.get('/courses', async(req, res) => {
         const result = await coursesCollection.find().toArray();
         res.send(result);
     })
-    
     
     
     // find all instructors
@@ -72,12 +72,14 @@ async function run() {
         res.send(result);
     })
 
+
     // find top courses based of number of students
     app.get('/topCourses', async(req, res) => {
         const result = await coursesCollection.find().sort({numberOfStudents: -1}).toArray();
         const slicedResult = result.slice(0, 6);
         res.send(slicedResult);
     })
+
 
     // find top instructors based of number of students
     app.get('/topInstructors', async(req, res) => {
@@ -86,10 +88,6 @@ async function run() {
         const slicedResult = result.slice(0, 6);
         res.send(slicedResult);
     })
-
-
-
-    
 
 
     // add an user
@@ -107,14 +105,12 @@ async function run() {
     })
 
 
-
     // add seleceted items
     app.post('/selectedItems', async(req, res) => {
       const itemInfo = req.body;
       const result = await selectedCollection.insertOne(itemInfo);
       res.send(result);
     })
-
 
 
     // get selected items for sepecific user
@@ -124,8 +120,6 @@ async function run() {
       const result = await selectedCollection.find(query).toArray();
       res.send(result);
     })
-
-
 
 
     // add new course
@@ -147,14 +141,21 @@ async function run() {
     })
 
 
-
     // get courses by specific instructor
     app.get('/coursesByInstructor', async(req, res) => {
       const instructorEmail = req.query.email;
       const query = {instructorEmail: instructorEmail};
       const result = await coursesCollection.find(query).toArray();
       res.send(result);
-      console.log(result);
+    })
+
+
+    // delete course from selected
+    app.delete('/selectedCourses/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {courseId: id};
+      const result = await selectedCollection.deleteOne(query);
+      res.send(result);
     })
     
 
