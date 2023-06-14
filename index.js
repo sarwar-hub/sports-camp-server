@@ -93,6 +93,12 @@ async function run() {
     // add an user
     app.post('/users', async(req, res) => {
         const userInfo = req.body;
+        // check if the user already exists while continue with google
+        const isExists = await usersCollection.findOne({email: userInfo.email});
+        if(isExists) {
+          return;
+        }
+        
         const user = {
             name: userInfo.name,
             email: userInfo.email,
