@@ -106,7 +106,7 @@ async function run() {
 
     // find top courses based of number of students
     app.get('/topCourses', async (req, res) => {
-      const result = await coursesCollection.find().sort({ numberOfStudents: -1 }).toArray();
+      const result = await coursesCollection.find().sort({ students: -1 }).toArray();
       const slicedResult = result.slice(0, 6);
       res.send(slicedResult);
     })
@@ -115,7 +115,7 @@ async function run() {
     // find top instructors based of number of students
     app.get('/topInstructors', async (req, res) => {
       const query = { role: "instructor" }
-      const result = await usersCollection.find(query).sort({ numberOfStudents: -1 }).toArray();
+      const result = await usersCollection.find(query).sort({ students: -1 }).toArray();
       const slicedResult = result.slice(0, 6);
       res.send(slicedResult);
     })
@@ -212,6 +212,7 @@ async function run() {
       }
       await coursesCollection.updateOne(query, updates, options);
 
+
     })
 
 
@@ -240,7 +241,8 @@ async function run() {
       const options = { upsert: true };
       const doc = {
         $set: {
-          role: 'instructor'
+          role: 'instructor',
+          students: 0
         }
       }
       const result = await usersCollection.updateOne(query, doc, options);
