@@ -37,6 +37,7 @@ const client = new MongoClient(uri, {
 // middleware to verify token
 const verifyJWT = (req, res, next) => {
   const authorization = req.headers.authorization;
+  console.log(authorization);
   if(!authorization) {
     return res.status(401).send({error: 'Unauthorized access'})
   }
@@ -55,17 +56,18 @@ const verifyJWT = (req, res, next) => {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+     await client.connect();
 
     const coursesCollection = client.db('sportsCamp').collection('courses');
     const usersCollection = client.db('sportsCamp').collection('users');
     const selectedCollection = client.db('sportsCamp').collection('selected');
+    const enrolledCollection = client.db('sportsCamp').collection('enrolledCourses');
 
 
-    // // send token
+    // generate token
     app.post('/jwt', async(req, res) => {
       const body = req.body;
-      const token = jwt.sign(body, process.env.SECRET_TOKEN, { expiresIn: 60 * 60 })
+      const token = jwt.sign(body, process.env.SECRET_TOKEN, { expiresIn: '1h' })
       res.send({token});
     })
 
@@ -152,6 +154,15 @@ async function run() {
       const userEmail = req.query.email;
       const query = { userEmail: userEmail };
       const result = await selectedCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    // get enrolled items for sepecific user
+    app.get('/enrolledCourses', async (req, res) => {
+      const buyerEmail = req.query.email;
+      console.log(buyerEmail);
+      const query = { buyerEmail: buyerEmail };
+      const result = await enrolledCollection.find(query).toArray();
       res.send(result);
     })
 
@@ -258,9 +269,10 @@ async function run() {
 
 
 
-    // payment intent
+    // // payment intent
     app.post('/create-payment-intent', async (req, res) => {
-      const { price } = req.body; 
+      const { price } = req.body;
+
       const amount = price * 100;
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
