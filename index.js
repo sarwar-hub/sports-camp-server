@@ -1,13 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-require('dotenv').config();
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -37,16 +38,16 @@ const client = new MongoClient(uri, {
 // middleware to verify token
 const verifyJWT = (req, res, next) => {
   const authorization = req.headers.authorization;
-  console.log(authorization);
-  if(!authorization) {
-    return res.status(401).send({error: 'Unauthorized access'})
+
+  if (!authorization) {
+    return res.status(401).send({ error: 'Unauthorized access' })
   }
   const token = authorization.split(' ')[1];
 
   // verify token
-  jwt.verify(token, process.env.SECRET_TOKEN, (error, decoded) =>{
-    if(error) {
-      return res.status(401).send({error: 'Unauthorized access'})
+  jwt.verify(token, process.env.SECRET_TOKEN, (error, decoded) => {
+    if (error) {
+      return res.status(401).send({ error: 'Unauthorized access' })
     }
     req.decoded = decoded;
     next();
@@ -56,7 +57,7 @@ const verifyJWT = (req, res, next) => {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-     await client.connect();
+    await client.connect();
 
     const coursesCollection = client.db('sportsCamp').collection('courses');
     const usersCollection = client.db('sportsCamp').collection('users');
@@ -65,10 +66,10 @@ async function run() {
 
 
     // generate token
-    app.post('/jwt', async(req, res) => {
+    app.post('/jwt', async (req, res) => {
       const body = req.body;
       const token = jwt.sign(body, process.env.SECRET_TOKEN, { expiresIn: '1h' })
-      res.send({token});
+      res.send({ token });
     })
 
 
@@ -160,7 +161,7 @@ async function run() {
     // get enrolled items for sepecific user
     app.get('/enrolledCourses', async (req, res) => {
       const buyerEmail = req.query.email;
-      console.log(buyerEmail);
+      
       const query = { buyerEmail: buyerEmail };
       const result = await enrolledCollection.find(query).toArray();
       res.send(result);
@@ -183,6 +184,30 @@ async function run() {
       }
       const result = await coursesCollection.insertOne(courseInfo);
       res.send(result);
+
+    })
+
+    // add enrolled courses
+    app.post('/enrolledCourses', async (req, res) => {
+      const data = req.body;
+      const courseId = data.id;
+      
+      const result = await enrolledCollection.insertOne(data);
+      res.send(result);
+      await selectedCollection.deleteOne({courseId: courseId});
+      
+      const course = await coursesCollection.findOne({_id: new ObjectId(courseId)});
+      const seats = course?.availableSeats;
+      const seat = parseInt(seats);
+      
+      const query = {_id: new ObjectId(courseId)};
+      const options = {upsert: true};
+      const updates = {
+        $set: {
+          availableSeats: seat - 1
+        }
+      }
+      await coursesCollection.updateOne(query, updates, options);
 
     })
 
@@ -272,12 +297,12 @@ async function run() {
     // // payment intent
     app.post('/create-payment-intent', async (req, res) => {
       const { price } = req.body;
+      const priceInt = parseInt(price)
 
-      const amount = price * 100;
+      const amount = priceInt * 100;
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
-        currency: 'usd',
-        automatic_payment_methods: ['card']
+        currency: 'usd'
 
       })
       res.send({
