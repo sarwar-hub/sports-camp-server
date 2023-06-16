@@ -198,13 +198,16 @@ async function run() {
       
       const course = await coursesCollection.findOne({_id: new ObjectId(courseId)});
       const seats = course?.availableSeats;
+      const students = course?.students;
       const seat = parseInt(seats);
+      const student = parseInt(students);
       
       const query = {_id: new ObjectId(courseId)};
       const options = {upsert: true};
       const updates = {
         $set: {
-          availableSeats: seat - 1
+          availableSeats: seat - 1,
+          students: student + 1
         }
       }
       await coursesCollection.updateOne(query, updates, options);
