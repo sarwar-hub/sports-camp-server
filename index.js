@@ -57,7 +57,7 @@ const verifyJWT = (req, res, next) => {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    //await client.connect();
 
     const coursesCollection = client.db('sportsCamp').collection('courses');
     const usersCollection = client.db('sportsCamp').collection('users');
@@ -151,7 +151,7 @@ async function run() {
 
 
     // get selected items for sepecific user
-    app.get('/selectedItems', verifyJWT, async (req, res) => {
+    app.get('/selectedItems', async (req, res) => {
       const userEmail = req.query.email;
       const query = { userEmail: userEmail };
       const result = await selectedCollection.find(query).toArray();
